@@ -1,13 +1,19 @@
 package com.app.rules;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import io.quarkus.runtime.Quarkus;
+import io.quarkus.runtime.QuarkusApplication;
+import io.quarkus.runtime.annotations.QuarkusMain;
 
-@SpringBootApplication
-public class ClinicalRuleEngineServiceApplication {
+@QuarkusMain
+public class ClinicalRuleEngineServiceApplication implements QuarkusApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ClinicalRuleEngineServiceApplication.class, args);
+        Quarkus.run(ClinicalRuleEngineServiceApplication.class, args);
     }
 
+    @Override
+    public int run(String... args) throws Exception {
+        Quarkus.waitForExit();
+        return 0;
+    }
 }
