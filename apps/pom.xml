@@ -18,11 +18,10 @@
         <module>user-service</module>
         <module>patient-record-service</module>
         <module>triage-orchestrator-service</module>
-        <module>clinical-rule-engine-service</module>
     </modules>
 
     <dependencies>
-        
+
 
         <!-- Lombok -->
         <dependency>
