@@ -1,0 +1,28 @@
+services:
+  authorization-postgres:
+    image: postgres:latest
+    container_name: authorization-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: authorization_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata-auth:/var/lib/postgresql/data
+
+  authorization-service:
+    build: .
+    container_name: authorization-service
+    depends_on:
+      - authorization-postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://authorization-postgres:5432/authorization_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8080:8080"
+      - "9090:9090"
+
+volumes:
+  pgdata-auth:
