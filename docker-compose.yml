@@ -1,9 +1,7 @@
-version: '3.8'
-
 services:
   # Database Services
   postgres:
-    image: postgres:15
+    image: postgres:latest
     container_name: siga-sus-postgres
     environment:
       POSTGRES_DB: siga-sus-app
@@ -13,18 +11,6 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - siga-sus-network
-
-  mongo:
-    image: mongo:latest
-    container_name: siga-sus-mongo
-    environment:
-      MONGO_INITDB_DATABASE: auth_db
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongo_data:/data/db
     networks:
       - siga-sus-network
 
@@ -38,23 +24,6 @@ services:
     networks:
       - siga-sus-network
 
-  # Management Services
-  mongo-express:
-    image: mongo-express
-    container_name: siga-sus-mongo-express
-    environment:
-      ME_CONFIG_MONGODB_SERVER: mongo
-      ME_CONFIG_MONGODB_PORT: 27017
-      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
-      ME_CONFIG_BASICAUTH: "true"
-      ME_CONFIG_SITE_SESSIONSECRET: secret
-    ports:
-      - "8090:8081"
-    depends_on:
-      - mongo
-    networks:
-      - siga-sus-network
-
   # Microservices
   api-gateway:
     build:
@@ -65,10 +34,8 @@ services:
       - "8080:8080"
     depends_on:
       - auth-service
-      - user-service
       - patient-record-service
       - triage-orchestrator-service
-      - clinical-rule-engine-service
     networks:
       - siga-sus-network
 
@@ -77,22 +44,15 @@ services:
       context: ./apps/auth-service
       dockerfile: Dockerfile
     container_name: siga-sus-auth-service
-    ports:
-      - "8081:8081"
-    depends_on:
-      - mongo
-    networks:
-      - siga-sus-network
-
-  user-service:
-    build:
-      context: ./apps/user-service
-      dockerfile: Dockerfile
-    container_name: siga-sus-user-service
-    ports:
-      - "8085:8085"
     depends_on:
       - postgres
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/siga-sus-app
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8081:8081"
+      - "9091:9091"
     networks:
       - siga-sus-network
 
@@ -118,20 +78,11 @@ services:
       - "9090:9090"  # gRPC port
     depends_on:
       - redis
-      - clinical-rule-engine-service
+
     networks:
       - siga-sus-network
 
-  clinical-rule-engine-service:
-    build:
-      context: ./apps/clinical-rule-engine-service
-      dockerfile: Dockerfile
-    container_name: siga-sus-clinical-rule-engine-service
-    ports:
-      - "8084:8084"
-      - "9091:9091"  # gRPC port
-    networks:
-      - siga-sus-network
+
 
 networks:
   siga-sus-network:
