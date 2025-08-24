@@ -3,7 +3,6 @@ package com.app.gateway.service;
 import com.grpc.token.TokenValidationServiceGrpc;
 import com.grpc.token.ValidateTokenRequest;
 import com.grpc.token.ValidateTokenResponse;
-import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
