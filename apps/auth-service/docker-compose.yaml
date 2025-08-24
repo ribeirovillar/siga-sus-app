@@ -1,28 +1,28 @@
 services:
-  authorization-postgres:
+  postgres:
     image: postgres:latest
-    container_name: authorization-postgres
+    container_name: siga-sus-postgres
     environment:
+      POSTGRES_DB: siga-sus-app
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: authorization_db
     ports:
       - "5432:5432"
     volumes:
-      - pgdata-auth:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
 
-  authorization-service:
+  auth-service:
     build: .
-    container_name: authorization-service
+    container_name: auth-service
     depends_on:
-      - authorization-postgres
+      - postgres
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://authorization-postgres:5432/authorization_db
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/siga-sus-app
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
     ports:
-      - "8080:8080"
-      - "9090:9090"
+      - "8081:8081"
+      - "9091:9091"
 
 volumes:
-  pgdata-auth:
+  postgres_data:

@@ -8,7 +8,7 @@ import com.siga.sus.authorization.service.validation.login.LoginValidationStrate
 import com.siga.sus.authorization.service.validation.register.RegisterValidationStrategy;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +19,6 @@ import java.util.List;
 public class AuthService {
 
     UserRepository userRepository;
-    PasswordEncoder passwordEncoder;
     JwtTokenProvider jwtTokenProvider;
     List<RegisterValidationStrategy> registerValidations;
     List<LoginValidationStrategy> loginValidations;
@@ -36,7 +35,7 @@ public class AuthService {
 
     public User register(User user) {
         registerValidations.forEach(strategy -> strategy.validate(user));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
         return userRepository.save(user);
     }
 }

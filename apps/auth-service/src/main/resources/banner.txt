@@ -6,5 +6,5 @@
 
 ${spring.application.name} ${spring.application.version}
 ${spring.application.description}
-${spring.application.host}${server.port}${springdoc.swagger-ui.path}
+${spring.application.host}${server.port}${server.servlet.context-path}${springdoc.swagger-ui.path}
 Powered by Spring Boot ${spring-boot.version}

@@ -6,7 +6,7 @@ import com.siga.sus.authorization.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -16,15 +16,13 @@ import org.springframework.util.StringUtils;
 public class CredentialValidation implements LoginValidationStrategy {
 
     UserRepository userRepository;
-    PasswordEncoder passwordEncoder;
-
 
     @Override
     public void validate(User request) {
         if (StringUtils.hasText(request.getUsername())) {
             User user = userRepository.findByUsername(request.getUsername())
                     .orElseThrow(AuthException::invalidCredentials);
-            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            if (!BCrypt.checkpw(request.getPassword(), user.getPassword())) {
                 throw AuthException.invalidCredentials();
             }
         }

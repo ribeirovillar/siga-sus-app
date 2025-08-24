@@ -4,7 +4,6 @@ import com.siga.sus.authorization.exception.AuthException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -19,14 +18,6 @@ public class GlobalExceptionHandler {
         problemDetail.setTitle("Authentication Error");
         problemDetail.setProperty("timestamp", Instant.now());
         return ResponseEntity.status(e.getStatus()).body(problemDetail);
-    }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ProblemDetail> handleAuthenticationException(AuthenticationException e) {
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, e.getMessage());
-        problemDetail.setTitle("Authentication Failed");
-        problemDetail.setProperty("timestamp", Instant.now());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problemDetail);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

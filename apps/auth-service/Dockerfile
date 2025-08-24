@@ -1,15 +1,10 @@
-FROM maven:3.9.11-eclipse-temurin-24 AS build
+FROM eclipse-temurin:24-jdk as build
 WORKDIR /app
-
-COPY pom.xml ./
-COPY src/ ./src/
-
-RUN mvn clean package -DskipTests
+RUN apt-get update && apt-get install -y protobuf-compiler
+COPY . .
+RUN ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:24-jre
 WORKDIR /app
-
-COPY --from=build /app/target/*.jar ./app.jar
-
-EXPOSE 8080
-CMD ["java", "-jar", "app.jar"]
+COPY --from=build /app/target/*.jar app.jar
+ENTRYPOINT ["java", "-jar", "app.jar"]

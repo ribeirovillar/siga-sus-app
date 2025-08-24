@@ -1,6 +1,8 @@
 package com.siga.sus.authorization.grpc;
-
 import com.siga.sus.authorization.security.JwtTokenProvider;
+import com.siga.sus.grpc.TokenValidationServiceGrpc;
+import com.siga.sus.grpc.ValidateTokenRequest;
+import com.siga.sus.grpc.ValidateTokenResponse;
 import io.grpc.stub.StreamObserver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

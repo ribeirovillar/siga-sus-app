@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping("/auth")
+@RequestMapping()
 @Tag(name = "Autenticação", description = "Endpoints para autenticação e registro de usuários")
 public interface AuthApi {
 

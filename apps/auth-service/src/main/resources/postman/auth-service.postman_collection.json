@@ -106,7 +106,7 @@
 	"variable": [
 		{
 			"key": "url_base",
-			"value": "{{url}}{{port}}",
+			"value": "http://localhost:8081",
 			"type": "string"
 		}
 	]
