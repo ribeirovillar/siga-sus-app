@@ -27,6 +27,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <compiler-plugin.version>3.14.0</compiler-plugin.version>
+        <grpc.version>1.75.0</grpc.version>
     </properties>
 
     <!-- Lista de módulos (serviços) -->

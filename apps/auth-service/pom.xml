@@ -14,7 +14,6 @@
 	<description>Authorization Service - Gerencia Registro e login de utilizadores</description>
 
     <properties>
-		<grpc.version>1.75.0</grpc.version>
 		<protobuf-java.version>4.32.0</protobuf-java.version>
 		<spring-grpc.version>0.10.0</spring-grpc.version>
 		<org.mapstruct.version>1.6.3</org.mapstruct.version>
