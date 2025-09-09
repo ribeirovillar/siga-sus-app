@@ -14,38 +14,29 @@ services:
     networks:
       - siga-sus-network
 
-  redis:
-    image: redis:7-alpine
-    container_name: siga-sus-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - siga-sus-network
-
   # Microservices
   api-gateway:
     build:
-      context: ./apps/api-gateway
+      context: ./api-gateway
       dockerfile: Dockerfile
     container_name: siga-sus-api-gateway
     ports:
       - "8080:8080"
-    depends_on:
-      - auth-service
-      - patient-record-service
-      - triage-orchestrator-service
+    environment:
+      AUTH_SERVICE_ROUTE_URI: http://auth-service:8081
+      CLINICAL_ENGINE_QUARKUS_ROUTE_URI: http://clinical-engine-quarkus:8082
+      GRPC_CLIENT_TOKEN_VALIDATION_HOST: static://auth-service:9091
     networks:
       - siga-sus-network
 
   auth-service:
     build:
-      context: ./apps/auth-service
+      context: ./auth-service
       dockerfile: Dockerfile
     container_name: siga-sus-auth-service
     depends_on:
       - postgres
+      - api-gateway
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/siga-sus-app
       SPRING_DATASOURCE_USERNAME: postgres
@@ -56,32 +47,19 @@ services:
     networks:
       - siga-sus-network
 
-  patient-record-service:
+  clinical-engine-quarkus:
     build:
-      context: ./apps/patient-record-service
+      context: ./clinical-engine-quarkus
       dockerfile: Dockerfile
-    container_name: siga-sus-patient-record-service
+    depends_on:
+      - api-gateway
+    environment:
+      QUARKUS_HTTP_PORT: 8082
+      GEMINI_API_KEY: KEY_HERE
     ports:
       - "8082:8082"
-    depends_on:
-      - postgres
     networks:
       - siga-sus-network
-
-  triage-orchestrator-service:
-    build:
-      context: ./apps/triage-orchestrator-service
-      dockerfile: Dockerfile
-    container_name: siga-sus-triage-orchestrator-service
-    ports:
-      - "8083:8083"
-      - "9090:9090"  # gRPC port
-    depends_on:
-      - redis
-
-    networks:
-      - siga-sus-network
-
 
 
 networks:
@@ -90,5 +68,3 @@ networks:
 
 volumes:
   postgres_data:
-  mongo_data:
-  redis_data:
