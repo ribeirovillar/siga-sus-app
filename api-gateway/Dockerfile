@@ -1,8 +1,8 @@
-FROM eclipse-temurin:24-jdk as build
+FROM maven:3.9.11-eclipse-temurin-24 as build
 WORKDIR /app
 RUN apt-get update && apt-get install -y protobuf-compiler
 COPY . .
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:24-jre
 WORKDIR /app
