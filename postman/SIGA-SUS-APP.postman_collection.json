@@ -1,0 +1,727 @@
+{
+	"info": {
+		"_postman_id": "siga-sus-collection-id",
+		"name": "SIGA-SUS-APP - Sistema de Triagem Hospitalar",
+		"description": "Collection completa para testar todos os endpoints da aplicação SIGA-SUS-APP\n\n## 🏥 Sobre a Aplicação\nSistema Integrado de Gestão e Análise do SUS - Aplicação de Triagem Hospitalar com IA\n\n## 🚀 Como usar:\n1. Configure as variáveis de ambiente\n2. Execute o registro de usuário\n3. Faça login para obter o token JWT\n4. Use o token nos endpoints protegidos\n5. Teste a análise de triagem\n\n## 🔐 Autenticação\nTodos os endpoints protegidos requerem token JWT no header:\n`Authorization: Bearer {{jwt_token}}`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "siga-sus-exporter"
+	},
+	"item": [
+		{
+			"name": "🔐 Autenticação",
+			"item": [
+				{
+					"name": "Registrar Usuário",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.test('Usuário registrado com sucesso', function () {",
+									"        pm.expect(response.username).to.not.be.undefined;",
+									"    });",
+									"    console.log('✅ Usuário registrado:', response.username);",
+									"} else {",
+									"    console.log('❌ Erro no registro:', pm.response.text());",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Dr. João Silva\",\n    \"username\": \"joao.silva\",\n    \"password\": \"senha123\",\n    \"role\": \"DOCTOR\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registra um novo usuário no sistema.\n\n**Roles disponíveis:**\n- `DOCTOR` - Médico\n- `NURSE` - Enfermeiro\n\n**Exemplo de resposta:**\n```json\n{\n    \"id\": 1,\n    \"name\": \"Dr. João Silva\",\n    \"username\": \"joao.silva\",\n    \"role\": \"DOCTOR\",\n    \"createdAt\": \"2023-01-01T10:00:00Z\"\n}\n```"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('jwt_token', response.token);",
+									"    pm.test('Login realizado com sucesso', function () {",
+									"        pm.expect(response.token).to.not.be.undefined;",
+									"        pm.expect(response.username).to.not.be.undefined;",
+									"    });",
+									"    console.log('✅ Login realizado com sucesso para:', response.username);",
+									"    console.log('🔑 Token JWT salvo nas variáveis de ambiente');",
+									"} else {",
+									"    console.log('❌ Erro no login:', pm.response.text());",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"joao.silva\",\n    \"password\": \"senha123\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Autentica o usuário e retorna um token JWT.\n\n**Exemplo de resposta:**\n```json\n{\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n    \"username\": \"joao.silva\",\n    \"name\": \"Dr. João Silva\",\n    \"role\": \"DOCTOR\",\n    \"expiresAt\": \"2023-01-01T11:00:00Z\"\n}\n```\n\n⚠️ **Importante:** O token é automaticamente salvo na variável de ambiente `jwt_token` para uso nos próximos requests."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para autenticação e registro de usuários no sistema."
+		},
+		{
+			"name": "🏥 Triagem Clínica",
+			"item": [
+				{
+					"name": "Análise de Triagem - Caso Emergencial (Vermelho)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.test('Análise realizada com sucesso', function () {",
+									"        pm.expect(response.analysisId).to.not.be.undefined;",
+									"        pm.expect(response.patientName).to.not.be.undefined;",
+									"        pm.expect(response.classification).to.not.be.undefined;",
+									"    });",
+									"    console.log('🏥 Análise concluída para:', response.patientName);",
+									"    console.log('🚨 Classificação:', response.classification?.recommendedClassification);",
+									"    console.log('⏱️ Tempo recomendado:', response.timeRecommendation);",
+									"} else {",
+									"    console.log('❌ Erro na análise:', pm.response.text());",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientName\": \"Maria Santos\",\n    \"age\": 65,\n    \"gender\": \"Feminino\",\n    \"temperature\": 39.2,\n    \"heartRate\": 120,\n    \"respiratoryRate\": 28,\n    \"bloodPressureSystolic\": 80,\n    \"bloodPressureDiastolic\": 50,\n    \"oxygenSaturation\": 88,\n    \"painScale\": 9,\n    \"chiefComplaint\": \"Dor no peito e falta de ar\",\n    \"symptomDescription\": \"Dor intensa no peito tipo aperto, irradiando para braço esquerdo, acompanhada de falta de ar severa e sudorese\",\n    \"symptomDuration\": \"2 horas\",\n    \"symptomProgressionWorsening\": true,\n    \"comorbidities\": [\"Diabetes\", \"Hipertensão\", \"Doença Arterial Coronariana\"],\n    \"currentMedications\": [\"Metformina\", \"Losartana\", \"AAS\"],\n    \"allergies\": [\"Penicilina\"],\n    \"immunosuppressed\": false,\n    \"pregnant\": false,\n    \"recentSurgery\": false,\n    \"anticoagulantUse\": true,\n    \"additionalNotes\": \"Paciente com histórico de infarto há 2 anos. Chegou em cadeira de rodas, muito agitada e com dor intensa.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/triage",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"triage"
+							]
+						},
+						"description": "Análise de triagem para um caso **EMERGENCIAL** (classificação vermelha).\n\n**Características do caso:**\n- 🔴 **Paciente**: Mulher, 65 anos\n- 🚨 **Sintomas**: Dor no peito + dispneia severa\n- ⚠️ **Sinais vitais alterados**: Hipotensão, taquicardia, febre alta\n- 📋 **Comorbidades**: Diabetes, hipertensão, DAC\n- 💊 **Anticoagulante**: Em uso\n\n**Expectativa:** Classificação VERMELHA com atendimento imediato."
+					},
+					"response": []
+				},
+				{
+					"name": "Análise de Triagem - Caso Urgente (Amarelo)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.test('Análise realizada com sucesso', function () {",
+									"        pm.expect(response.analysisId).to.not.be.undefined;",
+									"        pm.expect(response.patientName).to.not.be.undefined;",
+									"        pm.expect(response.classification).to.not.be.undefined;",
+									"    });",
+									"    console.log('🏥 Análise concluída para:', response.patientName);",
+									"    console.log('🟡 Classificação:', response.classification?.recommendedClassification);",
+									"    console.log('⏱️ Tempo recomendado:', response.timeRecommendation);",
+									"} else {",
+									"    console.log('❌ Erro na análise:', pm.response.text());",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientName\": \"Carlos Oliveira\",\n    \"age\": 45,\n    \"gender\": \"Masculino\",\n    \"temperature\": 38.5,\n    \"heartRate\": 95,\n    \"respiratoryRate\": 20,\n    \"bloodPressureSystolic\": 140,\n    \"bloodPressureDiastolic\": 90,\n    \"oxygenSaturation\": 96,\n    \"painScale\": 7,\n    \"chiefComplaint\": \"Dor abdominal intensa\",\n    \"symptomDescription\": \"Dor intensa no abdome, lado direito, que começou ao redor do umbigo e migrou\",\n    \"symptomDuration\": \"6 horas\",\n    \"symptomProgressionWorsening\": true,\n    \"comorbidities\": [],\n    \"currentMedications\": [],\n    \"allergies\": [],\n    \"immunosuppressed\": false,\n    \"pregnant\": false,\n    \"recentSurgery\": false,\n    \"anticoagulantUse\": false,\n    \"additionalNotes\": \"Paciente refere náuseas e vômitos. Dor piorou significativamente nas últimas 2 horas.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/triage",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"triage"
+							]
+						},
+						"description": "Análise de triagem para um caso **URGENTE** (classificação amarela).\n\n**Características do caso:**\n- 🟡 **Paciente**: Homem, 45 anos\n- 🩺 **Sintomas**: Dor abdominal migratória (suspeita apendicite)\n- 📈 **Progressão**: Sintomas piorando\n- 🌡️ **Febre**: Presente (38.5°C)\n- 📋 **Sem comorbidades relevantes**\n\n**Expectativa:** Classificação AMARELA com avaliação em até 1 hora."
+					},
+					"response": []
+				},
+				{
+					"name": "Análise de Triagem - Caso Eletivo (Verde)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.test('Análise realizada com sucesso', function () {",
+									"        pm.expect(response.analysisId).to.not.be.undefined;",
+									"        pm.expect(response.patientName).to.not.be.undefined;",
+									"        pm.expect(response.classification).to.not.be.undefined;",
+									"    });",
+									"    console.log('🏥 Análise concluída para:', response.patientName);",
+									"    console.log('🟢 Classificação:', response.classification?.recommendedClassification);",
+									"    console.log('⏱️ Tempo recomendado:', response.timeRecommendation);",
+									"} else {",
+									"    console.log('❌ Erro na análise:', pm.response.text());",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientName\": \"Ana Costa\",\n    \"age\": 28,\n    \"gender\": \"Feminino\",\n    \"temperature\": 36.8,\n    \"heartRate\": 75,\n    \"respiratoryRate\": 16,\n    \"bloodPressureSystolic\": 120,\n    \"bloodPressureDiastolic\": 80,\n    \"oxygenSaturation\": 98,\n    \"painScale\": 3,\n    \"chiefComplaint\": \"Dor de cabeça leve\",\n    \"symptomDescription\": \"Dor de cabeça leve e intermitente, sem outros sintomas associados\",\n    \"symptomDuration\": \"3 dias\",\n    \"symptomProgressionWorsening\": false,\n    \"comorbidities\": [],\n    \"currentMedications\": [],\n    \"allergies\": [],\n    \"immunosuppressed\": false,\n    \"pregnant\": false,\n    \"recentSurgery\": false,\n    \"anticoagulantUse\": false,\n    \"additionalNotes\": \"Paciente jovem, sem sintomas graves. Busca orientação médica por precaução.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/triage",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"triage"
+							]
+						},
+						"description": "Análise de triagem para um caso **ELETIVO** (classificação verde).\n\n**Características do caso:**\n- 🟢 **Paciente**: Mulher jovem, 28 anos\n- 🩺 **Sintomas**: Cefaleia leve, sem piora\n- 📊 **Sinais vitais**: Todos normais\n- 📋 **Sem comorbidades**\n- ✅ **Quadro estável**\n\n**Expectativa:** Classificação VERDE com atendimento em até 4 horas."
+					},
+					"response": []
+				},
+				{
+					"name": "Análise de Triagem - Caso Pediátrico",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.test('Análise realizada com sucesso', function () {",
+									"        pm.expect(response.analysisId).to.not.be.undefined;",
+									"        pm.expect(response.patientName).to.not.be.undefined;",
+									"        pm.expect(response.classification).to.not.be.undefined;",
+									"    });",
+									"    console.log('🏥 Análise concluída para:', response.patientName);",
+									"    console.log('👶 Caso pediátrico - Classificação:', response.classification?.recommendedClassification);",
+									"    console.log('⏱️ Tempo recomendado:', response.timeRecommendation);",
+									"} else {",
+									"    console.log('❌ Erro na análise:', pm.response.text());",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientName\": \"Pedro Silva\",\n    \"age\": 8,\n    \"gender\": \"Masculino\",\n    \"temperature\": 39.5,\n    \"heartRate\": 130,\n    \"respiratoryRate\": 24,\n    \"bloodPressureSystolic\": 95,\n    \"bloodPressureDiastolic\": 60,\n    \"oxygenSaturation\": 97,\n    \"painScale\": 6,\n    \"chiefComplaint\": \"Febre alta e mal estar\",\n    \"symptomDescription\": \"Febre alta há 1 dia, irritabilidade, recusa alimentar, sonolência\",\n    \"symptomDuration\": \"24 horas\",\n    \"symptomProgressionWorsening\": true,\n    \"comorbidities\": [],\n    \"currentMedications\": [\"Dipirona\"],\n    \"allergies\": [],\n    \"immunosuppressed\": false,\n    \"pregnant\": false,\n    \"recentSurgery\": false,\n    \"anticoagulantUse\": false,\n    \"additionalNotes\": \"Criança de 8 anos, trazida pela mãe. Febre não cede completamente com antitérmico. Criança sonolenta mas responsiva.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/triage",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"triage"
+							]
+						},
+						"description": "Análise de triagem para um caso **PEDIÁTRICO**.\n\n**Características do caso:**\n- 👶 **Paciente**: Criança, 8 anos\n- 🌡️ **Febre alta**: 39.5°C persistente\n- 😴 **Sintomas**: Irritabilidade, sonolência\n- 📈 **Piora**: Sintomas piorando\n- ⚠️ **Atenção especial**: Paciente pediátrico requer cuidado especial\n\n**Expectativa:** Classificação mais conservadora devido à idade."
+					},
+					"response": []
+				},
+				{
+					"name": "Análise de Triagem - Caso Obstétrico",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.test('Análise realizada com sucesso', function () {",
+									"        pm.expect(response.analysisId).to.not.be.undefined;",
+									"        pm.expect(response.patientName).to.not.be.undefined;",
+									"        pm.expect(response.classification).to.not.be.undefined;",
+									"    });",
+									"    console.log('🏥 Análise concluída para:', response.patientName);",
+									"    console.log('🤰 Caso obstétrico - Classificação:', response.classification?.recommendedClassification);",
+									"    console.log('⏱️ Tempo recomendado:', response.timeRecommendation);",
+									"} else {",
+									"    console.log('❌ Erro na análise:', pm.response.text());",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"patientName\": \"Fernanda Lima\",\n    \"age\": 32,\n    \"gender\": \"Feminino\",\n    \"temperature\": 37.2,\n    \"heartRate\": 95,\n    \"respiratoryRate\": 18,\n    \"bloodPressureSystolic\": 150,\n    \"bloodPressureDiastolic\": 95,\n    \"oxygenSaturation\": 98,\n    \"painScale\": 4,\n    \"chiefComplaint\": \"Dor de cabeça e visão embaçada\",\n    \"symptomDescription\": \"Dor de cabeça forte, visão embaçada e inchaço nas mãos e pés\",\n    \"symptomDuration\": \"2 dias\",\n    \"symptomProgressionWorsening\": true,\n    \"comorbidities\": [],\n    \"currentMedications\": [\"Ácido fólico\", \"Ferro\"],\n    \"allergies\": [],\n    \"immunosuppressed\": false,\n    \"pregnant\": true,\n    \"gestationalWeek\": 34,\n    \"recentSurgery\": false,\n    \"anticoagulantUse\": false,\n    \"additionalNotes\": \"Gestante de 34 semanas, com suspeita de pré-eclâmpsia. Acompanhada pelo marido, muito preocupada.\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/triage",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"triage"
+							]
+						},
+						"description": "Análise de triagem para um caso **OBSTÉTRICO**.\n\n**Características do caso:**\n- 🤰 **Paciente**: Gestante, 32 anos, 34 semanas\n- 🩺 **Sintomas**: Cefaleia + visão turva + edema\n- 🔴 **Suspeita**: Pré-eclâmpsia\n- 📊 **PA elevada**: 150/95 mmHg\n- ⚠️ **Alto risco**: Gestação avançada + hipertensão\n\n**Expectativa:** Classificação de alta prioridade devido ao risco materno-fetal."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para análise de triagem clínica utilizando IA.\n\n**🤖 Inteligência Artificial:**\n- Análise baseada no Protocolo de Manchester\n- Integração com Google Gemini AI\n- Classificação automática de risco\n- Suporte à decisão clínica\n\n**🏥 Classificações:**\n- 🔴 **VERMELHO** (Emergencial): <15 min\n- 🟡 **AMARELO** (Urgente): <1 hora  \n- 🟢 **VERDE** (Eletivo): <4 horas"
+		},
+		{
+			"name": "📊 Monitoramento",
+			"item": [
+				{
+					"name": "Health Check - API Gateway",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('API Gateway está funcionando', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    console.log('✅ API Gateway: Funcionando');",
+									"} else {",
+									"    console.log('❌ API Gateway: Com problemas');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/actuator/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"actuator",
+								"health"
+							]
+						},
+						"description": "Verifica o status de saúde do API Gateway.\n\n**Retorna:**\n- Status dos serviços\n- Conectividade com banco de dados\n- Status dos microserviços"
+					},
+					"response": []
+				},
+				{
+					"name": "Health Check - Auth Service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Auth Service está funcionando', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    console.log('✅ Auth Service: Funcionando');",
+									"} else {",
+									"    console.log('❌ Auth Service: Com problemas');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/health",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"health"
+							]
+						},
+						"description": "Verifica o status de saúde do Auth Service.\n\n**Endpoint direto:** Acesso direto ao serviço de autenticação."
+					},
+					"response": []
+				},
+				{
+					"name": "Health Check - Clinical Engine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Clinical Engine está funcionando', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    console.log('✅ Clinical Engine: Funcionando');",
+									"} else {",
+									"    console.log('❌ Clinical Engine: Com problemas');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{clinical_engine_url}}/q/health",
+							"host": [
+								"{{clinical_engine_url}}"
+							],
+							"path": [
+								"q",
+								"health"
+							]
+						},
+						"description": "Verifica o status de saúde do Clinical Engine (Quarkus).\n\n**Endpoint direto:** Acesso direto ao serviço de análise clínica."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para monitoramento da saúde dos serviços.\n\n**🔍 Verificações:**\n- Status de funcionamento\n- Conectividade de rede\n- Saúde do banco de dados\n- Disponibilidade da IA"
+		},
+		{
+			"name": "📚 Documentação",
+			"item": [
+				{
+					"name": "Swagger UI - Auth Service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Swagger UI carregado', function () {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(pm.response.text()).to.include('swagger');",
+									"});",
+									"",
+									"console.log('📖 Swagger UI do Auth Service disponível');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/swagger-ui.html",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"swagger-ui.html"
+							]
+						},
+						"description": "Interface Swagger para documentação interativa do Auth Service.\n\n**Inclui:**\n- Endpoints de autenticação\n- Schemas de request/response\n- Testes interativos"
+					},
+					"response": []
+				},
+				{
+					"name": "OpenAPI Spec - Auth Service",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('OpenAPI spec disponível', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"if (pm.response.code === 200) {",
+									"    const spec = pm.response.json();",
+									"    console.log('📋 OpenAPI spec carregado:', spec.info?.title);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{auth_service_url}}/v3/api-docs",
+							"host": [
+								"{{auth_service_url}}"
+							],
+							"path": [
+								"v3",
+								"api-docs"
+							]
+						},
+						"description": "Especificação OpenAPI 3.0 do Auth Service em formato JSON."
+					},
+					"response": []
+				},
+				{
+					"name": "Swagger UI - Clinical Engine",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Swagger UI carregado', function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"console.log('📖 Swagger UI do Clinical Engine disponível');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{clinical_engine_url}}/swagger-ui",
+							"host": [
+								"{{clinical_engine_url}}"
+							],
+							"path": [
+								"swagger-ui"
+							]
+						},
+						"description": "Interface Swagger para documentação interativa do Clinical Engine.\n\n**Inclui:**\n- Endpoint de triagem\n- Parâmetros de entrada\n- Exemplos de resposta"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para acessar a documentação interativa das APIs.\n\n**📖 Documentação:**\n- Swagger UI interativo\n- Especificações OpenAPI\n- Schemas e exemplos"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-configure base URLs if not set",
+					"if (!pm.environment.get('base_url')) {",
+					"    pm.environment.set('base_url', 'http://localhost:8080');",
+					"}",
+					"if (!pm.environment.get('auth_service_url')) {",
+					"    pm.environment.set('auth_service_url', 'http://localhost:8081');",
+					"}",
+					"if (!pm.environment.get('clinical_engine_url')) {",
+					"    pm.environment.set('clinical_engine_url', 'http://localhost:8082');",
+					"}",
+					"",
+					"console.log('🔧 Environment configured:');",
+					"console.log('   API Gateway:', pm.environment.get('base_url'));",
+					"console.log('   Auth Service:', pm.environment.get('auth_service_url'));",
+					"console.log('   Clinical Engine:', pm.environment.get('clinical_engine_url'));"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global response logging",
+					"if (pm.response.code >= 400) {",
+					"    console.log('❌ Request failed:', pm.info.requestName);",
+					"    console.log('   Status:', pm.response.code, pm.response.status);",
+					"    console.log('   Response:', pm.response.text());",
+					"} else {",
+					"    console.log('✅ Request successful:', pm.info.requestName);",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "auth_service_url",
+			"value": "http://localhost:8081",
+			"type": "string"
+		},
+		{
+			"key": "clinical_engine_url",
+			"value": "http://localhost:8082",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
+
